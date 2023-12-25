@@ -1,18 +1,21 @@
 import mongoose from 'mongoose';
 
-const priceHistorySchema = new mongoose.Schema({
-  price: { type: String, required: true },
-  date: { type: String ,required: true },
-});
+const now = new Date()
+
 const productSchema = new mongoose.Schema({
   name: { type: String, required: true, unique: false },
   category: { type: String, required: true, unique: false },
   imageUrl: { type: String, required: true, unique: false },
-  currentPrice: { type: String, unique: false },
-  // brand: { type: String, required: true, unique: false },
-  lastUpdate: {type: String, required: true, unique: false },
+  currentPrice: { type: Number, required: true, unique: false },
+  brand: { type: String, required: true, unique: false },
+  
   url: { type: String, required: true, unique: false},
-  priceHistory: [priceHistorySchema]
+  priceHistory: [
+    { 
+      price: { type: Number, required: true },
+      date: { type: Date, default: Date.now }
+    },
+  ],
 });
 
 productSchema.set("toJSON", {
@@ -23,6 +26,6 @@ productSchema.set("toJSON", {
   },
 });
 
-const Product = mongoose.model("Product", productSchema, "Products");
+const Product = mongoose.models.Product || mongoose.model('Product', productSchema);
 
 export default Product;

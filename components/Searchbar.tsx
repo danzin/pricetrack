@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, FormEvent } from "react"
-
+import { scrapeAndStoreProduct } from '@/lib/actions';
 const isValidProductURL = (url: string) => {
   try {
     const parsedUrl = new URL(url);
@@ -21,7 +21,7 @@ const Searchbar = () => {
   const [searchPrompt, setSearchPrompt] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const isValidLink = isValidProductURL(searchPrompt);
@@ -31,7 +31,7 @@ const Searchbar = () => {
       setIsLoading(true);
 
       //Scrape product
-      
+      const product = await scrapeAndStoreProduct(searchPrompt);
     } catch (e) {
       console.log(e);
     } finally{
