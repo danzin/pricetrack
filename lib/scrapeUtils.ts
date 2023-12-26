@@ -21,7 +21,7 @@ export function extractPrice(input: any){
 }
 
 export function extractReviewsCount(input: any){
-  if(!input) return "extractReviewsCount received empty input";
+  if(!input) return 0;
 
   const match = input.match(/\((\d+)\s*ревю(?:та)?\)/);
   if(match) {
@@ -33,7 +33,7 @@ export function extractReviewsCount(input: any){
 }
 
 export function extractStarRating(input: any) {
-  if(!input) return "extractStarRating received empty input";
+  if(!input) return 0;
 
   const match = input.trim('').match(/(\d+(\.\d+)?)/);
   if(match) {

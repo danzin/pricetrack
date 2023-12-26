@@ -1,56 +1,56 @@
-/*
-Using Playwright with headless chromium for scraping because 
-any requests coming from axios are blocked by Emag
-regardless of proxy configuration or user-agent presented
-*/
-import playwright from 'playwright';
+import axios from 'axios';
+import cheerio from 'cheerio';
 import { extractCodeProduct, extractPrice, extractReviewsCount, extractStarRating, removeHTML } from '../scrapeUtils';
 
-const DEFAULT_TIMEOUT = 4000;
+const DEFAULT_TIMEOUT = 1400;
 
-export async function scrapeEmagProduct(url: string){
-  if(!url) return;
-  const browser = await playwright.chromium.launch({
-    headless: true,
-  });
-  const page = await browser.newPage();
+export async function scrapeEmagProduct(url: string) {
+  if (!url) return;
+
   try {
-    await page.goto(url);
-    await page.waitForTimeout(DEFAULT_TIMEOUT);
-    let productTitle = await page.locator('.page-title').textContent();
-    productTitle = productTitle?.trim()!;
+    const response = await axios.get(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+        'Accept-Language': 'en-US,en;q=0.9',
+      },
+    });
 
-    let productPrice =  await page.locator('.product-new-price').first().textContent();
+    const $ = cheerio.load(response.data);
+    await new Promise(resolve => setTimeout(resolve, DEFAULT_TIMEOUT));
+    let productTitle = $('.page-title').text().trim();
+    let productPrice = $('.product-new-price').first().text();
     const currentPrice = extractPrice(productPrice);
 
-    let linkImageElement =  page.locator('.product-gallery-image').first();
-    let hrefValue = await linkImageElement.getAttribute('href');
+    let linkImageElement = $('.product-gallery-image').first();
+    let hrefValue = linkImageElement.attr('href');
 
-    let brand = await page.locator('.disclaimer-section > p > a').textContent();
+    let brand = $('.disclaimer-section > p > a').text();
 
-    let n = await page.locator('.breadcrumb > li').count();
-    let category = await page.locator('.breadcrumb > li').nth(n-3).textContent();
-    
-    const hasRating = await page.$('.rating-text');
-    var reviewsCount: any = 0;
-    var starRating: any = 0;
+    let n = $('.breadcrumb > li').length;
+    let category = $('.breadcrumb > li').eq(n - 3).text();
 
-    if(hasRating){
-      let reviewsEl = await page.locator('.rating-text > span').first().textContent();
+    const hasRating = $('.rating-text');
+    var reviewsCount = 0;
+    var starRating = 0;
+
+    if (hasRating.length) {
+      let reviewsEl = $('.rating-text > span').first().text();
       reviewsCount = extractReviewsCount(reviewsEl);
-  
-      let starRatingElement = await page.locator('.rating-text').first().textContent();
+
+      let starRatingElement = $('.rating-text').first().text();
       starRating = extractStarRating(starRatingElement);
     }
-    let description: any = await page.locator('#description-body').first().textContent();
+
+    let description = $('#description-body').first().text();
     description = removeHTML(description);
 
-    let productCodeEl = await page.locator('.product-code-display').first().textContent();
+    let productCodeEl = $('.product-code-display').first().text();
     const productCode = extractCodeProduct(productCodeEl);
+
     const product = {
       name: productTitle,
-      category: category || ' ',
-      imageUrl: hrefValue!,
+      category: category || '',
+      imageUrl: hrefValue || '',
       currentPrice: currentPrice,
       brand: brand || '',
       url: url,
@@ -64,13 +64,10 @@ export async function scrapeEmagProduct(url: string){
       highestPrice: Number(currentPrice),
       averagePrice: Number(currentPrice),
     };
-    console.log('SCRAPED PRODUCT: ', product)
-    return product;
-    
-    }catch (e: any) {
-      throw new Error(`Failed to scrape product: ${e.message}`);
-    }finally {
-    await browser.close();
-  }
 
+    console.log('SCRAPED PRODUCT: ', product);
+    return product;
+  } catch (e: any) {
+    throw new Error(`Failed to scrape product: ${e.message}`);
+  }
 }
