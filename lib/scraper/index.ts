@@ -6,15 +6,33 @@ const DEFAULT_TIMEOUT = 1400;
 
 export async function scrapeEmagProduct(url: string) {
   if (!url) return;
+  const username = String(process.env.BRIGHTDATA_USERNAME)
+  const password = String(process.env.BRIGHTDATA_PASSWORD)
+  const port = 22225;
+  const session_id = (111111 * Math.random()) | 0;
 
+  const options = {
+    headers: {
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+      'Accept-Language': 'en-US,en;q=0.9',
+    },
+    auth: {
+      username: `${username}-session-${session_id}`,
+      password,
+
+    },
+    host: 'brd.superproxy.io',
+    port,
+    rejectUnauthorized: false
+  }
+  
   try {
-    const response = await axios.get(url, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-        'Accept-Language': 'en-US,en;q=0.9',
-      },
+    axios.interceptors.request.use(request => {
+      console.log('Starting Request', request);
+      return request;
     });
-
+    
+    const response = await axios.get(url, options);
     const $ = cheerio.load(response.data);
     await new Promise(resolve => setTimeout(resolve, DEFAULT_TIMEOUT));
     let productTitle = $('.page-title').text().trim();
@@ -65,7 +83,6 @@ export async function scrapeEmagProduct(url: string) {
       averagePrice: Number(currentPrice),
     };
 
-    console.log('SCRAPED PRODUCT: ', product);
     return product;
   } catch (e: any) {
     throw new Error(`Failed to scrape product: ${e.message}`);

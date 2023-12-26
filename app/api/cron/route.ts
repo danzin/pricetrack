@@ -17,7 +17,7 @@ export async function GET() {
 
     const products = await Product.find({});
     if(!products) throw new Error("No products found");
-
+    
     //Scrape product
     const updatedProducts = await Promise.all(
       products.map(async(current) =>{

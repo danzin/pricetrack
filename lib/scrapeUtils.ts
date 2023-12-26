@@ -56,7 +56,6 @@ export function removeHTML(input: any){
   if(!input) return "removeHTML received empty input"
   var text = input.replace(/<\/?("[^"]*"|'[^']*'|[^>])*(>|$)/g, "").trim();
   const cleanedText = text.replace(/\n\s*\n/g, '\n\n');
-  console.log(cleanedText)
   return cleanedText
 }
 
