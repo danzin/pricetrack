@@ -16,7 +16,7 @@ export async function GET() {
     connectToDB();
 
     const products = await Product.find({});
-    if(!products) throw new Error("No products");
+    if(!products) throw new Error("No products found");
 
     //Scrape product
     const updatedProducts = await Promise.all(
