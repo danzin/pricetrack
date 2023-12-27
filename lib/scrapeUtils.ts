@@ -86,8 +86,8 @@ export function getLowestPrice(priceList: PriceHistoryItem[]) {
 export function getAveragePrice(priceList: PriceHistoryItem[]) {
   const sum = priceList.reduce((acc, curr) => acc + curr.price, 0);
   const averagePrice = sum / priceList.length || 0;
-
-  return averagePrice;
+  const formattedValue = parseFloat(averagePrice.toFixed(3)); 
+  return formattedValue;
 }
 export const getEmailNotifType = (
   scrapedProduct: Product,
