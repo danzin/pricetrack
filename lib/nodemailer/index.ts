@@ -76,8 +76,6 @@ export async function generateEmail(product: EmailProductInfo,type: Notification
   return { subject, body };
 }
 
-
-
 const transporter = nodemailer.createTransport({
   pool: true,
   service: 'hotmail',
@@ -92,7 +90,7 @@ const transporter = nodemailer.createTransport({
 async function verifyTransporter() {
   await new Promise((resolve, reject) => {
     // verify connection configuration
-    transporter.verify(function (error, success) {
+    transporter.verify(function (error: any, success: any) {
         if (error) {
             console.log(error);
             reject(error);
@@ -104,26 +102,39 @@ async function verifyTransporter() {
   });
 }
 verifyTransporter();
+
+const waitmeail = async (mailOptions: any) => {
+  try {
+    return await new Promise((resolve, reject) => {
+      transporter.sendMail(mailOptions, (error: any, info: any) => {
+        if (error) {
+          console.error(error);
+          reject(error);
+        } else {
+          console.log('Email sent: ', info);
+          resolve(info);
+        }
+      });
+    });
+  } catch (error) {
+    console.error('Error in waitmeail:', error);
+    throw error; // Rethrow the error for the caller to handle
+  }
+};
+
 export const sendEmail = async (emailContent: EmailContent, sendTo: string[]) => {
   const mailOptions = {
     from: 'pricetrackreminder@outlook.com',
     to: sendTo,
     html: emailContent.body,
     subject: emailContent.subject,
+  };
+
+  try {
+    console.log(await waitmeail(mailOptions));
+  } catch (error) {
+    console.error('Error in sendEmail:', error);
+    // Handle the error or rethrow it if needed
+    throw error;
   }
-
-  await new Promise((resolve, reject) => {
-    transporter.sendMail(mailOptions, (error: any, info: any) => {
-      if(error) {
-        console.error(error);
-        reject(error) 
-      } else {
-        console.log(info);
-        resolve(info);
-      }
-      
-      console.log('Email sent: ', info);
-    })
-
-  }) 
-}
+};
