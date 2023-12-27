@@ -14,8 +14,8 @@ const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const simulateHumanInteraction = async () => {
   // Simulate waiting time between actions
-  const waitTime = Math.floor(Math.random() * 1000) + 1000; 
-  console.log(`Simulating human-like behavior. Waiting for ${waitTime / 1000} seconds...`);
+  const waitTime = Math.floor(Math.random() * 500) + 1000; 
+  console.log(`Waiting for ${waitTime / 1000} seconds...`);
   await delay(waitTime);
 };
 
@@ -37,14 +37,19 @@ export async function GET(request: Request) {
         // Scrape product
         const scrapedProduct = await scrapeEmagProduct(currentProduct.url);
 
-        if (!scrapedProduct) return;
+        if (!scrapedProduct){
+          console.error('Scraped product is undefined:', scrapedProduct, ' Current Product: ', currentProduct );
+          return;
+        };
 
+        console.log('Current product priceHistory: ', currentProduct.priceHistory)
         const updatedPriceHistory = [
           ...currentProduct.priceHistory,
           {
             price: scrapedProduct.currentPrice,
           },
         ];
+        console.log('Updated product priceHistory: ', updatedPriceHistory)
 
         const product = {
           ...scrapedProduct,
@@ -61,6 +66,7 @@ export async function GET(request: Request) {
           },
           product
         );
+        console.log("updated product in database: ", updatedProduct)
 
         // Check status and send emails
         const emailNotifType = getEmailNotifType(
