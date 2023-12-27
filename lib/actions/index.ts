@@ -110,3 +110,21 @@ export async function addUserToProduct(productId: string, userEmail: string){
 
 }
 
+export async function heroImages() {
+  try {
+    const randomProducts = await Product.aggregate([
+      { $sample: { size: 5 } },
+    ]);
+
+    // Extract image URLs from the fetched products
+    const imageUrls = randomProducts.map((product) => ({
+      imgUrl: product.imageUrl,
+      alt: product.name, 
+    }));
+
+    return imageUrls;
+  } catch (error) {
+    console.error('Error fetching random products:', error);
+    return [];
+  }
+};

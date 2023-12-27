@@ -2,11 +2,11 @@ import Hero from '@/components/Hero'
 import Searchbar from '@/components/Searchbar'
 import Image from 'next/image'
 import React from 'react'
-import { getAllProducts } from '@/lib/actions'
+import { getAllProducts, heroImages } from '@/lib/actions'
 import ProductCard from '@/components/ProductCard'
 const Home = async () => {
   const allProducts = await getAllProducts();
-
+  const randomImages = await heroImages();
 
   return (
     <>
@@ -31,7 +31,7 @@ const Home = async () => {
             </p>
             <Searchbar/>
           </div>
-          <Hero/>
+          <Hero heroImages={randomImages}/>
         </div>
       </section>
       
