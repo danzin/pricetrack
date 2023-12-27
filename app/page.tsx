@@ -2,12 +2,12 @@
 import Hero from '@/components/Hero'
 import Searchbar from '@/components/Searchbar'
 import Image from 'next/image'
-import { getAllProducts, heroImages } from '@/lib/actions'
+import { recentlyDiscounted, getAllProducts, heroImages } from '@/lib/actions'
 import ProductCard from '@/components/ProductCard'
 const Home = async () => {
   const allProducts = await getAllProducts();
   const randomImages = await heroImages();
-
+  const discounted = await recentlyDiscounted(); 
 
   return (
     <>
@@ -36,6 +36,18 @@ const Home = async () => {
         </div>
       </section>
       
+    {discounted && discounted.length > 0 &&
+      <section className='trending-section'>
+        <h2 className='section-text'>Recent Discounts</h2>
+
+        <div className="flex flex-wrap gap-x-8 gap-y-16">
+          {discounted?.map((product) => (
+            <ProductCard key={product._id} product={product}/>
+          ))}
+        </div>
+      </section>}
+
+
       <section className='trending-section'>
         <h2 className='section-text'>Trending</h2>
 
@@ -46,6 +58,8 @@ const Home = async () => {
           ))}
         </div>
       </section>
+
+     
     </>
   )
 }

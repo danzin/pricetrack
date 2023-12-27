@@ -33,11 +33,12 @@ const Searchbar = () => {
 
       //Scrape product and reset search field
       await scrapeAndStoreProduct(searchPrompt);
-      setSearchPrompt('');
+
     } catch (e) {
       console.log(e);
     } finally{
       setIsLoading(false);
+      setSearchPrompt('');
     }
   }
 

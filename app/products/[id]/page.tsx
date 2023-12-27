@@ -1,5 +1,5 @@
 import React from 'react'
-import { getProductById, getSimilar } from '@/lib/actions'
+import { getProductById, getSimilar, getRelatedByCategory } from '@/lib/actions'
 import { redirect } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -15,7 +15,8 @@ const ProductDetails = async ( {params: {id}} : Props) => {
   const product: Product = await getProductById(id);
   if(!product) redirect('/');
 
-  const similarProducts = await getSimilar(id)
+  const relatedProducts = await getRelatedByCategory(id);
+  const similarProducts = await getSimilar(id);
   return (
     <div className='product-container'>
       
@@ -141,16 +142,25 @@ const ProductDetails = async ( {params: {id}} : Props) => {
 
       </div>
 
-      {similarProducts && similarProducts?.length > 0 && (
+      {relatedProducts && relatedProducts?.length > 0 ? (
         <div className='py-14 flex flex-col gap-2 w-full'>
           <p className='section-text'>Similar Products</p>
           <div className='flex flex-wrap gap-10 mt-7 w-full'>
-            {similarProducts.map((product) => (
+            {relatedProducts.map((product) => (
               <ProductCard key={product._id} product={product}/>
             ))}
           </div>
         </div>
-      )}
+      ) : 
+      <div className='py-14 flex flex-col gap-2 w-full'>
+      <p className='section-text'>Similar Products</p>
+      <div className='flex flex-wrap gap-10 mt-7 w-full'>
+        {similarProducts?.map((product) => (
+          <ProductCard key={product._id} product={product}/>
+        ))}
+      </div>
+    </div>
+      }
     </div>
   )
 }

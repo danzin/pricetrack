@@ -92,17 +92,18 @@ export async function getSimilar(productId: string) {
 
 export async function addUserToProduct(productId: string, userEmail: string){
   try {
-      const product = await Product.findById(productId);
-      if(!product) return;
-  
-      const userExists = product.users.some((user: User) => user.email === userEmail);
-      if(!userExists){
-        product.users.push({email: userEmail});
-        await product.save();
-      
-        const emailContent = await generateEmail(product, "WELCOME");
-        await sendEmail(emailContent, [userEmail]);
-      }
+    connectToDB();
+    const product = await Product.findById(productId);
+    if(!product) return;
+
+    const userExists = product.users.some((user: User) => user.email === userEmail);
+    if(!userExists){
+      product.users.push({email: userEmail});
+      await product.save();
+    
+      const emailContent = await generateEmail(product, "WELCOME");
+      await sendEmail(emailContent, [userEmail]);
+    }
 
   } catch (e) {
     console.log(e);
@@ -112,6 +113,7 @@ export async function addUserToProduct(productId: string, userEmail: string){
 
 export async function heroImages() {
   try {
+    connectToDB();
     const randomProducts = await Product.aggregate([
       { $sample: { size: 5 } },
     ]);
@@ -128,3 +130,44 @@ export async function heroImages() {
     return [];
   }
 };
+
+
+export async function recentlyDiscounted() {
+  try {
+    connectToDB();
+    const recentlyDiscountedProducts = await Product.find({
+      'priceHistory.1': { $exists: true }, 
+      $expr: {
+        $lt: [
+          { $arrayElemAt: ['$priceHistory.price', -1] }, 
+          { $arrayElemAt: ['$priceHistory.price', -2] },
+        ],
+      },
+    });
+    return recentlyDiscountedProducts;
+  } catch (error) {
+    console.error('Error finding recently discounted products:', error);
+  } 
+}
+
+export async function getRelatedByCategory(id: string) {
+  try {
+    connectToDB();
+    // Find products by brand
+    const product = await Product.findById(id);
+    if (!product) {
+      console.log(`Product with ID '${id}' not found.`);
+      return;
+    }
+
+    // Find more products from the same category
+    const relatedProducts = await Product.find({
+      _id: { $ne: id },
+      category: product.category,
+    }).limit(6);   
+     return relatedProducts;
+    } catch (error) {
+    console.error('Error finding products by category:', error);
+  } 
+}
+
