@@ -1,71 +1,93 @@
-import Product from "@/lib/models/product.model";
-import { connectToDB } from "@/lib/mongoose"
-import { generateEmail, sendEmail } from "@/lib/nodemailer";
-import { getAveragePrice, getEmailNotifType, getHighestPrice, getLowestPrice } from "@/lib/scrapeUtils";
-import { scrapeEmagProduct } from "@/lib/scraper";
 import { NextResponse } from "next/server";
 
+import { getLowestPrice, getHighestPrice, getAveragePrice, getEmailNotifType } from "@/lib/scrapeUtils";
+import { connectToDB } from "@/lib/mongoose";
+import Product from "@/lib/models/product.model";
+import { scrapeEmagProduct } from "@/lib/scraper";
+import { generateEmail, sendEmail } from "@/lib/nodemailer";
 
-export const maxDuration = 10;
-export const dynamic = 'force-dynamic';
+
+export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-export async function GET() {
+const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
+const simulateHumanInteraction = async () => {
+  // Simulate waiting time between actions
+  const waitTime = Math.floor(Math.random() * 2000) + 1000; 
+  console.log(`Simulating human-like behavior. Waiting for ${waitTime / 1000} seconds...`);
+  await delay(waitTime);
+};
+
+export async function GET(request: Request) {
   try {
+    console.log('------/api/GET execution in progress....---------');
     connectToDB();
 
     const products = await Product.find({});
-    if(!products) throw new Error("No products found");
-    
-    //Scrape product
-    const updatedProducts = await Promise.all(
-      products.map(async(current) =>{
-        const scrapedProduct = await scrapeEmagProduct(current.url);
 
-        if(!scrapedProduct) throw new Error('No product found');
-        
+    if (!products) throw new Error("No product fetched");
+
+    // Scrape and update products
+    const updatedProducts = await Promise.all(
+      products.map(async (currentProduct) => {
+
+        //Wait a for a moment
+        await simulateHumanInteraction();
+        // Scrape product
+        const scrapedProduct = await scrapeEmagProduct(currentProduct.url);
+
+        if (!scrapedProduct) return;
+
         const updatedPriceHistory = [
-          ...current.priceHistory,
-          { price: scrapedProduct.currentPrice }
-        ]
-        const updatedStarRating: any = scrapedProduct.starRating;
+          ...currentProduct.priceHistory,
+          {
+            price: scrapedProduct.currentPrice,
+          },
+        ];
+
         const product = {
           ...scrapedProduct,
           priceHistory: updatedPriceHistory,
-          starRating: updatedStarRating,
           lowestPrice: getLowestPrice(updatedPriceHistory),
           highestPrice: getHighestPrice(updatedPriceHistory),
           averagePrice: getAveragePrice(updatedPriceHistory),
-        }
+        };
 
+        // Update Products in DB
         const updatedProduct = await Product.findOneAndUpdate(
-          { url: product.url },
-          product,
+          {
+            url: product.url,
+          },
+          product
         );
 
-        //Check product status and send email   
-        const emailNotifType = getEmailNotifType(scrapedProduct, current)
-          if(emailNotifType && updatedProduct.users.length > 0){
-            const productInfo = {
-              name: updatedProduct.name,
-              url: updatedProduct.url,
-            }
+        // Check status and send emails
+        const emailNotifType = getEmailNotifType(
+          scrapedProduct,
+          currentProduct
+        );
 
-            const emailContent = await generateEmail(productInfo, emailNotifType);
-
-            const userMails = updatedProduct.users.map((user: any) => user.email);
-
-            await sendEmail(emailContent, userMails);
-          }
-
-          return updatedProduct;
+        if (emailNotifType && updatedProduct.users.length > 0) {
+          const productInfo = {
+            name: updatedProduct.name,
+            url: updatedProduct.url,
+          };
+          const emailContent = await generateEmail(productInfo, emailNotifType);
+          const userEmails = updatedProduct.users.map((user: any) => user.email);
+          await sendEmail(emailContent, userEmails);
+        }
+          //Wait a for a moment
+          await simulateHumanInteraction();
+        return updatedProduct;
       })
-    )
+    );
+      console.log('---------FINISHED /api/cron execution--------------')
     return NextResponse.json({
-      message: 'OK', data: updatedProducts
-    })
-  } catch (e) {
-    throw new Error(`GET Error: ${e}`)    
+      message: "Ok",
+      data: updatedProducts,
+    });
+  } catch (error: any) {
+    throw new Error(`Failed to get all products: ${error.message}`);
   }
 }

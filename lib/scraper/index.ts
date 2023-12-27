@@ -27,10 +27,7 @@ export async function scrapeEmagProduct(url: string) {
   }
   
   try {
-    axios.interceptors.request.use(request => {
-      console.log('Starting Request', request);
-      return request;
-    });
+  
     
     const response = await axios.get(url, options);
     const $ = cheerio.load(response.data);
