@@ -9,10 +9,7 @@ const Notification = {
   THRESHOLD_MET: 'THRESHOLD_MET',
 }
 
-export async function generateEmail(
-  product: EmailProductInfo,
-  type: NotificationType
-  ) {
+export async function generateEmail(product: EmailProductInfo,type: NotificationType){
   const THRESHOLD_PERCENTAGE = 40;
 
   const shortenedTitle =
@@ -80,6 +77,7 @@ export async function generateEmail(
 }
 
 
+
 const transporter = nodemailer.createTransport({
   pool: true,
   service: 'hotmail',
@@ -91,6 +89,21 @@ const transporter = nodemailer.createTransport({
   maxConnections: 1
 })
 
+async function verifyTransporter() {
+  await new Promise((resolve, reject) => {
+    // verify connection configuration
+    transporter.verify(function (error, success) {
+        if (error) {
+            console.log(error);
+            reject(error);
+        } else {
+            console.log("Server is ready to take our messages");
+            resolve(success);
+        }
+    });
+  });
+}
+verifyTransporter();
 export const sendEmail = async (emailContent: EmailContent, sendTo: string[]) => {
   const mailOptions = {
     from: 'pricetrackreminder@outlook.com',
@@ -99,9 +112,18 @@ export const sendEmail = async (emailContent: EmailContent, sendTo: string[]) =>
     subject: emailContent.subject,
   }
 
-  transporter.sendMail(mailOptions, (error: any, info: any) => {
-    if(error) return console.log(error);
-    
-    console.log('Email sent: ', info);
-  })
+  await new Promise((resolve, reject) => {
+    transporter.sendMail(mailOptions, (error: any, info: any) => {
+      if(error) {
+        console.error(error);
+        reject(error) 
+      } else {
+        console.log(info);
+        resolve(info);
+      }
+      
+      console.log('Email sent: ', info);
+    })
+
+  }) 
 }
