@@ -14,7 +14,7 @@ const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const simulateHumanInteraction = async () => {
   // Simulate waiting time between actions
-  const waitTime = Math.floor(Math.random() * 2000) + 1000; 
+  const waitTime = Math.floor(Math.random() * 1000) + 1000; 
   console.log(`Simulating human-like behavior. Waiting for ${waitTime / 1000} seconds...`);
   await delay(waitTime);
 };
@@ -32,7 +32,7 @@ export async function GET(request: Request) {
     const updatedProducts = await Promise.all(
       products.map(async (currentProduct) => {
 
-        //Wait a for a moment
+        //Wait
         await simulateHumanInteraction();
         // Scrape product
         const scrapedProduct = await scrapeEmagProduct(currentProduct.url);
@@ -77,7 +77,7 @@ export async function GET(request: Request) {
           const userEmails = updatedProduct.users.map((user: any) => user.email);
           await sendEmail(emailContent, userEmails);
         }
-          //Wait a for a moment
+          //Wait
           await simulateHumanInteraction();
         return updatedProduct;
       })
@@ -88,6 +88,6 @@ export async function GET(request: Request) {
       data: updatedProducts,
     });
   } catch (error: any) {
-    throw new Error(`Failed to get all products: ${error.message}`);
+    throw new Error(`Failed to get all products: ${error}`);
   }
 }

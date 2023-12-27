@@ -2,6 +2,7 @@
 
 import { useState, FormEvent } from "react"
 import { scrapeAndStoreProduct } from '@/lib/actions';
+
 const isValidProductURL = (url: string) => {
   try {
     const parsedUrl = new URL(url);
@@ -14,7 +15,6 @@ const isValidProductURL = (url: string) => {
     return false;
   }
   return false;
-
 }
 
 const Searchbar = () => {
@@ -30,8 +30,9 @@ const Searchbar = () => {
     try {
       setIsLoading(true);
 
-      //Scrape product
-      const product = await scrapeAndStoreProduct(searchPrompt);
+      //Scrape product and reset search field
+      await scrapeAndStoreProduct(searchPrompt);
+      setSearchPrompt('');
     } catch (e) {
       console.log(e);
     } finally{
