@@ -74,9 +74,9 @@ export async function scrapeEmagProduct(url: string) {
       productCode: productCode || '',
       reviewsCount: reviewsCount || 0,
       priceHistory: [],
-      lowestPrice: Number(currentPrice),
-      highestPrice: Number(currentPrice),
-      averagePrice: Number(currentPrice),
+      lowestPrice: Number(),
+      highestPrice: Number(),
+      averagePrice: Number(),
     };
 
     return product;

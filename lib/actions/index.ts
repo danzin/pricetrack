@@ -132,18 +132,52 @@ export async function heroImages() {
 };
 
 
+// export async function recentlyDiscounted() {
+//   try {
+//     connectToDB();
+//     const recentlyDiscountedProducts = await Product.find({
+//       'priceHistory.1': { $exists: true }, 
+//       $expr: {
+//         $lt: [
+//           { $arrayElemAt: ['$priceHistory.price', -1] }, 
+//           { $arrayElemAt: ['$priceHistory.price', -2] },
+//         ],
+//       },
+//     });
+//     return recentlyDiscountedProducts;
+//   } catch (error) {
+//     console.error('Error finding recently discounted products:', error);
+//   } 
+// }
+
+/*TODO: THIS ONE IS FOR TESTING PURPOSES AND UNTIL THE DATA AGES
+REMEMBER TO FIX RECENTLY DISCOUNTED. IT'S SUPPOSED TO RETURN RECENT DISCOUNTS FROM THE PAST
+FEW DAYS, THIS ONE RETURNS ONLY DISCOUNTED IF CURRENTPRICE > ORIGINAL PRICE WHICH IS INNACURATE 
+CONSIDERING THE BONKERS STATE OF PRICES AND DISCOUNTS ON THAT WEBSITE */
 export async function recentlyDiscounted() {
   try {
     connectToDB();
-    const recentlyDiscountedProducts = await Product.find({
-      'priceHistory.1': { $exists: true }, 
-      $expr: {
-        $lt: [
-          { $arrayElemAt: ['$priceHistory.price', -1] }, 
-          { $arrayElemAt: ['$priceHistory.price', -2] },
-        ],
+    const recentlyDiscountedProducts = await Product.aggregate([
+      {
+        $match: {
+          'originalPrice': { $exists: true },
+        },
       },
-    });
+      {
+        $addFields: {
+          discounted: {
+            $lt: ['$currentPrice', '$originalPrice'],
+          },
+        },
+      },
+      {
+        $match: {
+          'priceHistory.1': { $exists: true },
+          'discounted': true,
+        },
+      },
+    ]).sort({ updatedAt: -1 }).limit(10);
+
     return recentlyDiscountedProducts;
   } catch (error) {
     console.error('Error finding recently discounted products:', error);
