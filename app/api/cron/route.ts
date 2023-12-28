@@ -34,6 +34,7 @@ export async function GET(request: Request) {
 
         //Wait
         await simulateHumanInteraction();
+        
         // Scrape product
         const scrapedProduct = await scrapeEmagProduct(currentProduct.url);
 
@@ -45,7 +46,6 @@ export async function GET(request: Request) {
             price: scrapedProduct.currentPrice,
           },
         ];
-        console.log('currentProduct bottom of pricehistory array:', currentProduct.priceHistory[0])
         const product = {
           ...scrapedProduct,
           priceHistory: updatedPriceHistory,

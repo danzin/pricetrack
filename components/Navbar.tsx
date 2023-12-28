@@ -1,7 +1,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
-
+import ThemeSwitcher from './ThemeSwitcher'
 
 
 const navIcons = [
@@ -34,7 +34,7 @@ const Navbar = () => {
               width={28}
               className='object-contain' />
           ))}
-        
+        <ThemeSwitcher/>
         </div>
       </nav>
     </header>

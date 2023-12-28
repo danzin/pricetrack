@@ -35,8 +35,8 @@ const ProductDetails = async ( {params: {id}} : Props) => {
         <div className="flex-1 flex flex-col">
           <div className='flex justify-betweren items-start gap-5 flex-wrap pb-6'>
               <div className='flex flex-col gap-3'>
-                <p className='text-[28px] text-secondary font-semibold'>{product.name}</p>
-                <Link href={product.url} target='_blank' className='text-base text-black opacity-60'>
+                <p className='text-[28px] text-secondary dark:text-gray-200 font-semibold'>{product.name}</p>
+                <Link href={product.url} target='_blank' className='text-base text-black dark:text-gray-200 opacity-60'>
                   Visit Product Page
                 </Link>
               </div>
@@ -72,7 +72,7 @@ const ProductDetails = async ( {params: {id}} : Props) => {
 
             <div className='product-info'>
               <div className='flex-flex-col gap-2'>
-                <p className='text-34 text-secondary font-bold'>
+                <p className='text-34 text-secondary dark:text-gray-200 font-bold'>
                   {product.currentPrice}лв
                 </p>
               </div>
@@ -134,7 +134,7 @@ const ProductDetails = async ( {params: {id}} : Props) => {
       <div className='flex flex-col gap-16'>
 
           <div className='flex flex-col gap-5'>
-            <h3 className='text-2xl text-secondary font-semibold'>Product Description</h3>
+            <h3 className='text-2xl text-secondary font-semibold dark:text-gray-200'>Product Description</h3>
             <div className='flex flex-col gap-4'>
               <p>{product.description}</p>
             </div>

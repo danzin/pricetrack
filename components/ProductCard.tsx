@@ -22,13 +22,13 @@ const ProductCard = ({product}: PCProps) => {
 
       <div className='flex flex-col gap-1'>
         <h3 className='product-title'>{product.name}</h3>
-        <p className='text-black opacity-70'>
+        <p className='text-black opacity-70 dark:text-gray-200'>
           {product.productCode || ''}
         </p>
       </div>
    
       <div className='flex justify-between'>
-        <p className='text-black opacity-50'>{product.category}</p>
+        <p className='text-black opacity-50 dark:text-gray-200'>{product.category}</p>
       </div>
 
       <p>

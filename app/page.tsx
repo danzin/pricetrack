@@ -37,7 +37,7 @@ const Home = async () => {
       </section>
       
     {discounted && discounted.length > 0 &&
-      <section className='trending-section'>
+      <section className='trending-section '>
         <h2 className='section-text'>Recent Discounts</h2>
 
         <div className="flex flex-wrap gap-x-8 gap-y-16">
@@ -48,7 +48,7 @@ const Home = async () => {
       </section>}
 
 
-      <section className='trending-section'>
+      <section className='trending-section '>
         <h2 className='section-text'>Trending</h2>
 
         <div className="flex flex-wrap gap-x-8 gap-y-16">
