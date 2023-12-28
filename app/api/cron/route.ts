@@ -77,7 +77,14 @@ export async function GET(request: Request) {
           };
           const emailContent = await generateEmail(productInfo, emailNotifType);
           const userEmails = updatedProduct.users.map((user: any) => user.email);
-          await sendEmail(emailContent, userEmails);
+          await fetch('https://http://localhost:3000/api/send/', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ emailContent, userEmails }),
+          });
+
         }
           //Wait
           await simulateHumanInteraction();
