@@ -69,6 +69,7 @@ export async function scrapeEmagProduct(url: string) {
       currentPrice: currentPrice,
       brand: brand || '',
       url: url,
+      originalPrice: currentPrice,
       description: description,
       starRating: starRating || 0,
       productCode: productCode || '',
