@@ -37,23 +37,20 @@ export async function GET(request: Request) {
         // Scrape product
         const scrapedProduct = await scrapeEmagProduct(currentProduct.url);
 
-        if (!scrapedProduct){
-          console.error('Scraped product is undefined:', scrapedProduct, ' Current Product: ', currentProduct );
-          return;
-        };
+        if (!scrapedProduct) return;
 
-        console.log('Current product priceHistory: ', currentProduct.priceHistory)
         const updatedPriceHistory = [
           ...currentProduct.priceHistory,
           {
             price: scrapedProduct.currentPrice,
           },
         ];
-        console.log('Updated product priceHistory: ', updatedPriceHistory)
-
+        console.log('currentProduct bottom of pricehistory array:', currentProduct.priceHistory[0])
         const product = {
           ...scrapedProduct,
           priceHistory: updatedPriceHistory,
+          originalPrice: currentProduct.priceHistory[0].price,
+
           lowestPrice: getLowestPrice(updatedPriceHistory),
           highestPrice: getHighestPrice(updatedPriceHistory),
           averagePrice: getAveragePrice(updatedPriceHistory),
@@ -66,7 +63,6 @@ export async function GET(request: Request) {
           },
           product
         );
-        console.log("updated product in database: ", updatedProduct)
 
         // Check status and send emails
         const emailNotifType = getEmailNotifType(
