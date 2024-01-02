@@ -80,7 +80,7 @@ export function getLowestPrice(priceList: PriceHistoryItem[]) {
     }
   }
 
-  return lowestPrice.price;
+  return lowestPrice.price !== undefined ? lowestPrice.price : 0;
 }
 
 export function getAveragePrice(priceList: PriceHistoryItem[]) {

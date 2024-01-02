@@ -3,6 +3,14 @@ import cheerio from 'cheerio';
 import { extractCodeProduct, extractPrice, extractReviewsCount, extractStarRating, removeHTML } from '../scrapeUtils';
 
 const DEFAULT_TIMEOUT = 1400;
+const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+const simulateHumanInteraction = async () => {
+  // Simulate waiting time between actions
+  const waitTime = Math.floor(Math.random() * 500) + 1000; 
+  console.log(`Waiting for ${waitTime / 1000} seconds...`);
+  await delay(waitTime);
+};
 
 export async function scrapeEmagProduct(url: string) {
   if (!url) return;
@@ -27,27 +35,35 @@ export async function scrapeEmagProduct(url: string) {
   }
   
   try {
-  
-    
+    // Request the product url
     const response = await axios.get(url, options);
+    await simulateHumanInteraction();
     const $ = cheerio.load(response.data);
-    await new Promise(resolve => setTimeout(resolve, DEFAULT_TIMEOUT));
+    
+    // Get Title
     let productTitle = $('.page-title').text().trim();
+
+    // Get Price
     let productPrice = $('.product-new-price').first().text();
     const currentPrice = extractPrice(productPrice);
 
+    // Get Image
     let linkImageElement = $('.product-gallery-image').first();
     let hrefValue = linkImageElement.attr('href');
 
+    // Get Brand
     let brand = $('.disclaimer-section > p > a').text();
 
+    // Get Category
     let n = $('.breadcrumb > li').length;
     let category = $('.breadcrumb > li').eq(n - 3).text();
 
+    // Get Rating and reviews
     const hasRating = $('.rating-text');
     var reviewsCount = 0;
     var starRating = 0;
 
+    // If product has rating and reviews, get them
     if (hasRating.length) {
       let reviewsEl = $('.rating-text > span').first().text();
       reviewsCount = extractReviewsCount(reviewsEl);
@@ -56,12 +72,15 @@ export async function scrapeEmagProduct(url: string) {
       starRating = extractStarRating(starRatingElement);
     }
 
+    // Get Description
     let description = $('#description-body').first().text();
     description = removeHTML(description);
 
+    // Get Product Code
     let productCodeEl = $('.product-code-display').first().text();
     const productCode = extractCodeProduct(productCodeEl);
 
+    // Create Product object
     const product = {
       name: productTitle,
       category: category || '',
@@ -80,6 +99,7 @@ export async function scrapeEmagProduct(url: string) {
       averagePrice: Number(),
     };
 
+    // Return Product
     return product;
   } catch (e: any) {
     throw new Error(`Failed to scrape product: ${e.message}`);

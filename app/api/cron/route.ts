@@ -31,9 +31,6 @@ export async function GET(request: Request) {
     // Scrape and update products
     const updatedProducts = await Promise.all(
       products.map(async (currentProduct) => {
-
-        //Wait
-        await simulateHumanInteraction();
         
         // Scrape product
         const scrapedProduct = await scrapeEmagProduct(currentProduct.url);
@@ -64,7 +61,6 @@ export async function GET(request: Request) {
           product
         );
 
-        // Check status and send emails
         const emailNotifType = getEmailNotifType(
           scrapedProduct,
           currentProduct
@@ -79,8 +75,6 @@ export async function GET(request: Request) {
           const userEmails = updatedProduct.users.map((user: any) => user.email);
           await sendEmail(emailContent, userEmails);
         }
-          //Wait
-          await simulateHumanInteraction();
         return updatedProduct;
       })
     );
