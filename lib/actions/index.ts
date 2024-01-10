@@ -66,7 +66,7 @@ export async function getAllProducts() {
   try {
     connectToDB();
 
-    const products = await Product.find();
+    const products = await Product.find().sort({createdAt: -1});
     revalidatePath(`/products/`);
     return products;
   } catch (error) {
@@ -188,7 +188,6 @@ export async function recentlyDiscounted() {
 export async function getRelatedByCategory(id: string) {
   try {
     connectToDB();
-    // Find products by brand
     const product = await Product.findById(id);
     if (!product) {
       console.log(`Product with ID '${id}' not found.`);
