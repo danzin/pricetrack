@@ -2,7 +2,6 @@ import axios from 'axios';
 import cheerio from 'cheerio';
 import { extractCodeProduct, extractPrice, extractReviewsCount, extractStarRating, removeHTML } from '../scrapeUtils';
 
-const DEFAULT_TIMEOUT = 1400;
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const simulateHumanInteraction = async () => {
@@ -35,7 +34,7 @@ export async function scrapeEmagProduct(url: string) {
   }
   
   try {
-    // Request the product url
+    // Request product url
     const response = await axios.get(url, options);
     await simulateHumanInteraction();
     const $ = cheerio.load(response.data);
@@ -44,9 +43,11 @@ export async function scrapeEmagProduct(url: string) {
     let productTitle = $('.page-title').text().trim();
 
     // Get Price
-    let productPrice = $('.product-new-price').first().text();
+    let productPrice = $('.product-new-price').first().text().trim();
+    // console.log(productPrice)
     const currentPrice = extractPrice(productPrice);
-
+    console.log(Number(currentPrice))
+ 
     // Get Image
     let linkImageElement = $('.product-gallery-image').first();
     let hrefValue = linkImageElement.attr('href');
@@ -58,7 +59,6 @@ export async function scrapeEmagProduct(url: string) {
     let n = $('.breadcrumb > li').length;
     let category = $('.breadcrumb > li').eq(n - 3).text();
 
-    // Get Rating and reviews
     const hasRating = $('.rating-text');
     var reviewsCount = 0;
     var starRating = 0;

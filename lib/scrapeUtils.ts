@@ -8,17 +8,46 @@ const Notification = {
 
 const THRESHOLD_PERCENTAGE = 40;
 
-export function extractPrice(input: any){
-  if(!input) return "extractPrice received empty input";
 
-  let match = input.replace(/[лв]/g, '').replace(',', '.');
-  if(match){
-    match = match.substr(0, match.length - 2);
-    match = parseFloat(match);
-    return match;
+export function extractPrice(input:any){
+  if (input) {
+    const parts = input.split(',');
+    const result = parts[0];
+    return result.replace(/\D/g,'');
+  } else {
+    console.log('extractPrice received no input');
   }
-  throw new Error("extractPrice found no match");
 }
+
+
+// export function extractPrice(input: any){
+//   if(!input) return "extractPrice received empty input";
+//   // console.log(input);
+//   let match = input.replace(/[лв]/g, '')
+//   match = match.replace(' ', '')
+//   // match = match.replace('.', '')
+//   console.log(match)
+//   const formatter = new Intl.NumberFormat('bg-BG', {
+//     style: 'currency',
+//     currency: 'BGN'
+//   });
+//   if(match){
+//     const bulgarianCurrencyString = match;
+//     const cleanNumberString = bulgarianCurrencyString?.match(/\d+/g).join('');
+//     const bulgarianCurrencyNumber = parseInt(cleanNumberString, 10);
+    
+//     console.log(bulgarianCurrencyNumber);
+    
+//     const formatted = match.replace(',', '.')
+
+//     // console.log('extractPrice log1:',formatter.format(formatted))
+//     // const ret = formatter.format(formatted)
+//     // match = parseFloat(match).toFixed(3);
+//     // console.log(match)
+//     return match;
+//   }
+//   throw new Error("extractPrice found no match");
+// }
 
 export function extractReviewsCount(input: any){
   if(!input) return 0;
