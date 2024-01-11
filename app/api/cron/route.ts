@@ -28,7 +28,7 @@ export async function GET(request: Request) {
 
     if (!products) throw new Error("No product fetched");
 
-    // Scrape and update products
+    // Scrape and update all products at once
     const updatedProducts = await Promise.all(
       products.map(async (currentProduct) => {
         
@@ -46,7 +46,7 @@ export async function GET(request: Request) {
         const product = {
           ...scrapedProduct,
           priceHistory: updatedPriceHistory,
-          originalPrice: currentProduct.priceHistory[0].price,
+          originalPrice: currentProduct?.originalPrice,
 
           lowestPrice: getLowestPrice(updatedPriceHistory),
           highestPrice: getHighestPrice(updatedPriceHistory),
