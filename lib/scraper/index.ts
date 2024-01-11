@@ -1,7 +1,7 @@
 import axios from 'axios';
 import cheerio from 'cheerio';
 import { extractCodeProduct, extractPrice, extractReviewsCount, extractStarRating, removeHTML } from '../scrapeUtils';
-
+import { PriceHistoryItem, Product } from '@/types';
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const simulateHumanInteraction = async () => {
@@ -46,7 +46,6 @@ export async function scrapeEmagProduct(url: string) {
     let productPrice = $('.product-new-price').first().text().trim();
     // console.log(productPrice)
     const currentPrice = extractPrice(productPrice);
-    console.log(Number(currentPrice))
  
     // Get Image
     let linkImageElement = $('.product-gallery-image').first();
@@ -81,14 +80,14 @@ export async function scrapeEmagProduct(url: string) {
     const productCode = extractCodeProduct(productCodeEl);
 
     // Create Product object
-    const product = {
+    const product: Product = {
       name: productTitle,
       category: category || '',
       imageUrl: hrefValue || '',
       currentPrice: currentPrice,
       brand: brand || '',
       url: url,
-      originalPrice: currentPrice,
+      originalPrice: Number(),
       description: description,
       starRating: starRating || 0,
       productCode: productCode || '',

@@ -27,19 +27,32 @@ export async function scrapeAndStoreProduct(productUrl: string){
       product = {
         ...scrapedProduct,
         priceHistory: updatedPriceHistory,
-        originalPrice: existingProduct.priceHistory[0].price,
+        // originalPrice: existingProduct.priceHistory[0].price,
 
         starRating: updatedStarRating,
         lowestPrice: getLowestPrice(updatedPriceHistory),
         highestPrice: getHighestPrice(updatedPriceHistory),
         averagePrice: getAveragePrice(updatedPriceHistory),
       }
+      
+    } else {
+      const priceHistArray = [{
+        price: scrapedProduct.currentPrice
+      }]
+      product = {
+        ...scrapedProduct,
+        originalPrice: scrapedProduct.currentPrice,
+        priceHistory: priceHistArray
+      }
+
     }
+
     const newProduct = await Product.findOneAndUpdate(
       { url: scrapedProduct.url },
       product,
       { upsert: true, new: true }
     );
+    console.log(newProduct)
 
     revalidatePath(`/products/${newProduct._id}`);
   } catch (e: any) {
