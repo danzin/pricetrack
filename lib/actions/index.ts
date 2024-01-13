@@ -22,12 +22,11 @@ export async function scrapeAndStoreProduct(productUrl: string){
         ...existingProduct.priceHistory,
         { price: scrapedProduct.currentPrice }
       ]
-      
+
       const updatedStarRating: any = scrapedProduct.starRating;
       product = {
         ...scrapedProduct,
         priceHistory: updatedPriceHistory,
-        // originalPrice: existingProduct.priceHistory[0].price,
 
         starRating: updatedStarRating,
         lowestPrice: getLowestPrice(updatedPriceHistory),
@@ -36,14 +35,18 @@ export async function scrapeAndStoreProduct(productUrl: string){
       }
       
     } else {
+      const now = new Date()
       const priceHistArray = [{
-        price: scrapedProduct.currentPrice
+        price: scrapedProduct.currentPrice,
+        date: now,
       }]
       product = {
         ...scrapedProduct,
-        originalPrice: scrapedProduct.currentPrice,
         priceHistory: priceHistArray
       }
+      // if (product.priceHistory.length > 1) {
+      //   product.priceHistory.shift();
+      // }
 
     }
 
@@ -168,35 +171,35 @@ export async function heroImages() {
 REMEMBER TO FIX RECENTLY DISCOUNTED. IT'S SUPPOSED TO RETURN RECENT DISCOUNTS FROM THE PAST
 FEW DAYS, THIS ONE RETURNS ONLY DISCOUNTED IF CURRENTPRICE > ORIGINAL PRICE WHICH IS INNACURATE 
 CONSIDERING THE BONKERS STATE OF PRICES AND DISCOUNTS ON THAT WEBSITE */
-export async function recentlyDiscounted() {
-  try {
-    connectToDB();
-    const recentlyDiscountedProducts = await Product.aggregate([
-      {
-        $match: {
-          'originalPrice': { $exists: true },
-        },
-      },
-      {
-        $addFields: {
-          discounted: {
-            $lt: ['$currentPrice', '$originalPrice'],
-          },
-        },
-      },
-      {
-        $match: {
-          'priceHistory.1': { $exists: true },
-          'discounted': true,
-        },
-      },
-    ]).sort({ updatedAt: -1 }).limit(10);
+// export async function recentlyDiscounted() {
+//   try {
+//     connectToDB();
+//     const recentlyDiscountedProducts = await Product.aggregate([
+//       {
+//         $match: {
+//           'originalPrice': { $exists: true },
+//         },
+//       },
+//       {
+//         $addFields: {
+//           discounted: {
+//             $lt: ['$currentPrice', '$originalPrice'],
+//           },
+//         },
+//       },
+//       {
+//         $match: {
+//           'priceHistory.1': { $exists: true },
+//           'discounted': true,
+//         },
+//       },
+//     ]).sort({ updatedAt: -1 }).limit(10);
 
-    return recentlyDiscountedProducts;
-  } catch (error) {
-    console.error('Error finding recently discounted products:', error);
-  } 
-}
+//     return recentlyDiscountedProducts;
+//   } catch (error) {
+//     console.error('Error finding recently discounted products:', error);
+//   } 
+// }
 
 export async function getRelatedByCategory(id: string) {
   try {

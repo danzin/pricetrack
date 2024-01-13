@@ -5,7 +5,6 @@ const productSchema = new mongoose.Schema({
   category: { type: String, required: true, unique: false },
   imageUrl: { type: String, required: true, unique: false },
   currentPrice: { type: Number, required: true, unique: false },
-  originalPrice: { type: Number, required: false },
   lowestPrice: { type: Number },
   highestPrice: { type: Number },
   averagePrice: { type: Number },

@@ -113,20 +113,13 @@ export function getLowestPrice(priceList: PriceHistoryItem[]) {
 }
 
 export function getAveragePrice(priceList: PriceHistoryItem[]) {
-
-  //remove duplicates from priceList array
-  priceList = priceList.filter((value, index, self) =>
-    index === self.findIndex((t) => (
-      t.price === value.price
-    ))
-  ) 
-  //calculate average
+ 
   const sum = priceList.reduce((acc, curr) => acc + curr.price, 0);
-  const averagePrice = sum / priceList.length || 0;
-  //format value
-  const formattedValue = parseFloat(averagePrice.toFixed(3)); 
+  // console.log('getAveragePrice sum=', sum)
+  const averagePrice = Number(sum / priceList.length);
+   
+  return averagePrice;
 
-  return formattedValue;
 }
 
 export const getEmailNotifType = (

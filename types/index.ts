@@ -5,7 +5,6 @@ export type Product = {
   url: string;
   imageUrl: string;
   name: string;
-  originalPrice: number;
   category: string;
   currentPrice: number;
   averagePrice: number;

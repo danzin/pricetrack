@@ -35,6 +35,7 @@ export async function scrapeEmagProduct(url: string) {
   
   try {
     // Request product url
+    console.log('scraper');
     const response = await axios.get(url, options);
     await simulateHumanInteraction();
     const $ = cheerio.load(response.data);
@@ -87,17 +88,35 @@ export async function scrapeEmagProduct(url: string) {
       currentPrice: currentPrice,
       brand: brand || '',
       url: url,
-      originalPrice: Number(),
       description: description,
       starRating: starRating || 0,
       productCode: productCode || '',
       reviewsCount: reviewsCount || 0,
       priceHistory: [],
-      lowestPrice: Number(),
-      highestPrice: Number(),
-      averagePrice: Number(),
+      lowestPrice: currentPrice,
+      highestPrice: currentPrice,
+      averagePrice: currentPrice,
     };
 
+
+    // const mockProduct = {
+    //   name: 'title',
+    //   category: 'category',
+    //   imageUrl: 'hrefvalue',
+    //   currentPrice: 1000,
+    //   brand: 'brand',
+    //   url: 'url',
+    //   originalPrice: 1000,
+    //   description: 'description',
+    //   starRating: 0,
+    //   productCode: 'productCode',
+    //   reviewsCount: 0,
+    //   priceHistory: [],
+    //   lowestPrice: 1000,
+    //   highestPrice: 1000,
+    //   averagePrice: 1000,
+    // }
+    // return mockProduct;
     // Return Product
     return product;
   } catch (e: any) {

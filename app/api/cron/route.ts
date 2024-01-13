@@ -10,14 +10,7 @@ import { generateEmail, sendEmail } from "@/lib/nodemailer";
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-const simulateHumanInteraction = async () => {
-  // Simulate waiting time between actions
-  const waitTime = Math.floor(Math.random() * 500) + 1000; 
-  console.log(`Waiting for ${waitTime / 1000} seconds...`);
-  await delay(waitTime);
-};
 
 export async function GET(request: Request) {
   try {
@@ -32,22 +25,28 @@ export async function GET(request: Request) {
     const updatedProducts = await Promise.all(
       products.map(async (currentProduct) => {
         
-        // Scrape product
+        // Scrape product 
         const scrapedProduct = await scrapeEmagProduct(currentProduct.url);
-
+        let updatedPriceHistory = currentProduct.priceHistory;
         if (!scrapedProduct) return;
 
-        const updatedPriceHistory = [
-          ...currentProduct.priceHistory,
-          {
-            price: scrapedProduct.currentPrice,
-          },
-        ];
+        // Only update priceHistory array if the new price is different from the previous price
+        const prevPrice = currentProduct.priceHistory[currentProduct.priceHistory.length - 1].price;
+        if (prevPrice != scrapedProduct.currentPrice){
+          console.log('Updating priceHistory array.........');
+           updatedPriceHistory = [
+            ...currentProduct.priceHistory,
+            {
+              price: Number(scrapedProduct.currentPrice),
+              date: new Date(), 
+            },
+          ];
+        }
+  
+
         const product = {
           ...scrapedProduct,
           priceHistory: updatedPriceHistory,
-          originalPrice: currentProduct?.originalPrice,
-
           lowestPrice: getLowestPrice(updatedPriceHistory),
           highestPrice: getHighestPrice(updatedPriceHistory),
           averagePrice: getAveragePrice(updatedPriceHistory),
