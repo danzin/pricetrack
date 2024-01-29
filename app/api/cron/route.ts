@@ -59,7 +59,7 @@ export async function GET(request: Request) {
           },
           product
         );
-
+          
         const emailNotifType = getEmailNotifType(
           scrapedProduct,
           currentProduct

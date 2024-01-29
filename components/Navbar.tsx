@@ -25,15 +25,7 @@ const Navbar = () => {
            </p>
         </Link>
         <div className="flex items-center gap-5">
-          {navIcons.map((icon) => (
-            <Image
-              key={icon.alt}
-              src={icon.src}
-              alt={icon.alt}
-              height={28}
-              width={28}
-              className='object-contain' />
-          ))}
+        
         <ThemeSwitcher/>
         </div>
       </nav>

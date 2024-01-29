@@ -44,10 +44,6 @@ export async function scrapeAndStoreProduct(productUrl: string){
         ...scrapedProduct,
         priceHistory: priceHistArray
       }
-      // if (product.priceHistory.length > 1) {
-      //   product.priceHistory.shift();
-      // }
-
     }
 
     const newProduct = await Product.findOneAndUpdate(
